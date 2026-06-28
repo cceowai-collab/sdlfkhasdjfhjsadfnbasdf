@@ -27,7 +27,7 @@ markupBuySub = InlineKeyboardMarkup(
          InlineKeyboardButton(text='💎 Месяц - 3$', callback_data='BuySub3')],
         [InlineKeyboardButton(text='💎 Год - 6$', callback_data='BuySub6'),
          InlineKeyboardButton(text='💎 Навсегда - 10$', callback_data='BuySub10')],
-        [InlineKeyboardButton(text='💎 Оплата по карте', url=SUPPORT)]
+        [InlineKeyboardButton(text='💎 Stars|NFT|Card', url=SUPPORT)]
     ]
 )
 
