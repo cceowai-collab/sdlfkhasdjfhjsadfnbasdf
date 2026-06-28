@@ -7,7 +7,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.enums import ParseMode
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.filters import CommandStart
-from config import photo_path, ADMIN, photo_payment_path
+from config import photo_path, ADMIN, photo_payment_path , photo_wait_path
 from keyboards.keyboards import *
 from backend.snos import *
 from backend.database import *
@@ -102,7 +102,7 @@ async def handler_snos(callback: CallbackQuery, state: FSMContext):
     if check_status:
         if await checkSubDate(userid=user_id):
             await callback.message.answer(
-                "<b>📝 Отправьте ссылку на нарушение</b>",
+                "<b>📝 Отправьте жертву.\nПринимаются - Username,ссылка на чат\тгк, ссылка на бота</b>",
                 parse_mode=ParseMode.HTML
             )
             await state.set_state(States.VIOLATIONLINK)
@@ -138,7 +138,8 @@ async def get_violation_link(message: Message, state: FSMContext):
         return
 
     start_msg = await message.answer(
-        "<b>😶‍🌫️ Начинаю подачу жалоб</b>",
+
+        "<b>😶‍🌫️ Начинаю подачу жалоб...</b>\n\n⏳ Ожидайте, процесс может занять до 40 секунд",
         parse_mode=ParseMode.HTML
     )
 
@@ -152,24 +153,6 @@ async def get_violation_link(message: Message, state: FSMContext):
         f"<b>📄 Отчет:\n{result}</b>",
         parse_mode=ParseMode.HTML
     )
-
-    # Отправляем отчет админу с ФОТО
-    try:
-        await message.bot.send_photo(
-            chat_id=ADMIN,
-            photo=photo,  # 👈 ОБЯЗАТЕЛЬНО передаем photo
-            caption=f"<b>📄 Отчет о жалобе от пользователя {message.from_user.id}:\n{result}</b>",
-            parse_mode=ParseMode.HTML
-        )
-    except Exception as e:
-        # Если не получается отправить фото, отправляем просто текст
-        await message.bot.send_message(
-            chat_id=ADMIN,
-            text=f"<b>📄 Отчет о жалобе от пользователя {message.from_user.id}:\n{result}</b>",
-            parse_mode=ParseMode.HTML
-        )
-        print(f"Ошибка отправки фото админу: {e}")
-
 
 @router.callback_query(F.data == 'adminpanel')
 async def handler_admin(callback: CallbackQuery):
@@ -283,8 +266,9 @@ async def get_violation_link(message: Message, state: FSMContext):
         await state.set_state(States.VIOLATIONLINK)
         return
 
-    start_msg = await message.answer(
-        "<b>😶‍🌫️ Начинаю подачу жалоб</b>",
+    start_msg = await message.answer_photo(
+        photo=photo_wait_path,
+        caption="<b>😶‍🌫️ Начинаю подачу жалоб</b>",
         parse_mode=ParseMode.HTML
     )
     result = await report(link)
