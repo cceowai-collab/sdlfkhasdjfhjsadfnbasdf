@@ -1,6 +1,6 @@
 import os
 
-TOKEN = '8635690215:AAEzcl_4ALG02PV1x9c-dw0FzQKbfUsGlqA'
+TOKEN = '8635690215:AAFTYuAdUGFVfdWPgCEyPRhjpw7NAKzkx4M'
 ADMIN = 8603851230
 SUPPORT = 't.me/tuwiecom'
 WORK = ("t.me/tuwiecom")
