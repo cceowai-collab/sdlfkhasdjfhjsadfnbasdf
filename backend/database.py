@@ -9,6 +9,26 @@ DB_DIR = os.path.join(BASE_DIR, 'database')
 os.makedirs(DB_DIR, exist_ok=True)
 DATABASE_PATH = os.path.join(DB_DIR, 'database.db')
 
+async def createDatabase():
+    """Создает базу данных и таблицу"""
+    try:
+        async with aiosqlite.connect(DATABASE_PATH) as con:
+            await con.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    userid INTEGER PRIMARY KEY,
+                    sub BOOLEAN,
+                    date TEXT
+                )
+            ''')
+            await con.commit()
+            print("✅ Database and table checked/created")
+    except Exception as e:
+        print(f"Error in createDatabase: {e}")
+
+async def init_db():
+    """Инициализация базы данных (алиас)"""
+    await createDatabase()
+
 async def checkUser(userid):
     """Проверяет пользователя в БД"""
     print(f"Checking user {userid} in the database...")
@@ -57,22 +77,6 @@ async def closeSub(userid):
     except Exception as e:
         print(f"Error in closeSub: {e}")
 
-async def createDatabase():
-    """Создает базу данных"""
-    try:
-        async with aiosqlite.connect(DATABASE_PATH) as con:
-            await con.execute("""
-                CREATE TABLE IF NOT EXISTS users (
-                    userid INTEGER PRIMARY KEY,
-                    sub BOOLEAN,
-                    date TEXT
-                )
-            """)
-            await con.commit()
-            print("✅ Database and table checked/created")
-    except Exception as e:
-        print(f"Error in createDatabase: {e}")
-
 async def checkSubStatus(userid):
     """Проверяет статус подписки"""
     try:
@@ -115,3 +119,13 @@ async def subDate(userid):
     except Exception as e:
         print(f"Error in subDate: {e}")
         return None
+
+async def updateSubStatus(userid, status):
+    """Обновляет статус подписки в БД"""
+    try:
+        async with aiosqlite.connect(DATABASE_PATH) as con:
+            await con.execute("UPDATE users SET sub = ? WHERE userid = ?", (status, userid))
+            await con.commit()
+            print(f"Subscription status updated for {userid} to {status}")
+    except Exception as e:
+        print(f"Error in updateSubStatus: {e}")
