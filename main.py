@@ -1,18 +1,19 @@
+# main.py
 from aiogram import Bot, Dispatcher
 from config import TOKEN
 import asyncio
 from routers.handlers import router
-from aiogram.client.session.aiohttp import AiohttpSession
-
-dp = Dispatcher()
+from backend.database import createDatabase  # 👈 Используем createDatabase вместо init_db
 
 async def main():
-    # Используем HTTP прокси (порт 10809)
-    session = AiohttpSession(proxy="http://127.0.0.1:10809")
-
-    bot = Bot(TOKEN, session=session)
+    # Создаем базу данных
+    await createDatabase()
+    
+    # Запускаем бота без прокси
+    bot = Bot(TOKEN)
+    dp = Dispatcher()
     dp.include_router(router)
     await dp.start_polling(bot)
 
-
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())
